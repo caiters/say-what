@@ -1,0 +1,82 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Say What</title>
+
+    <style>
+        p { color: #666;}
+        .highlight { border: 2px solid yellow; color: #666; }
+        .selected { color: #000; border: 2px solid green; }
+    </style>
+</head>
+<body>
+    <div class="words">
+        <p>super</p>
+        <p>chicken</p>
+        <p>soup</p>
+        <p>beverage</p>
+        <p>spaghetti</p>
+        <p>waste</p>
+        <p>plate</p>
+    </div>
+
+    <label for="sayWhat">Start typing</label>
+    <input type="text" id="sayWhat" name="sayWhat" />
+
+    <script type="text/javascript">
+        const wordsNodes = Array.from(document.querySelectorAll('.words p'));
+
+        function initWords() {
+            const wordsArray = [];
+            wordsNodes.forEach(function(word){
+                wordsArray.push(word.innerHTML);
+            });
+            return wordsArray;
+        }
+
+        const words = initWords();
+
+        const input = document.querySelector('#sayWhat');
+
+        input.addEventListener('keyup', function(e) {
+            if(e.keyCode >=65 && e.keyCode <= 90 || e.keyCode == 8){
+                const possibleWords = selectWords(input.value);
+                const nodesToHighlight = selectNodes(possibleWords);
+                wordsNodes.forEach(function(node){
+                    node.classList.remove('highlight');
+                    node.classList.remove('selected');
+                });
+                if(nodesToHighlight.length > 1 && nodesToHighlight.length !== wordsNodes.length) {
+                    nodesToHighlight.forEach(function(node){
+                        node.classList.add('highlight');
+                    })
+                } else if (nodesToHighlight.length !== wordsNodes.length) {
+                    nodesToHighlight[0].classList.add('selected');
+                }
+            }
+        });
+
+        function selectNodes(words) {
+            const nodes = [];
+            words.forEach(function(word){
+                console.log(word);
+                wordsNodes.forEach(function(wordnode){
+                    if(wordnode.innerHTML === word) {
+                        nodes.push(wordnode);
+                    }
+                });
+            })
+            return nodes;
+        }
+
+        function selectWords(text) {
+            return words.filter(function(word){
+                return word.indexOf(text) === 0;
+            });
+        }
+    </script>
+</body>
+</html>
