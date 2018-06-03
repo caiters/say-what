@@ -42,6 +42,11 @@
         const input = document.querySelector('#sayWhat');
 
         input.addEventListener('keyup', function(e) {
+            console.log(e.keyCode, 'key code');
+            // if ESC
+            if(e.keyCode === 27) {
+                clearAll();
+            }
             if(e.keyCode >=65 && e.keyCode <= 90 || e.keyCode == 8){
                 const possibleWords = selectWords(input.value);
                 const nodesToHighlight = selectNodes(possibleWords);
@@ -58,6 +63,13 @@
                 }
             }
         });
+
+        function clearAll() {
+            input.value = '';
+            document.querySelectorAll('.highlight, .selected').forEach(function(node){
+                node.classList.remove('highlight', 'selected');
+            })
+        }
 
         function selectNodes(words) {
             const nodes = [];
