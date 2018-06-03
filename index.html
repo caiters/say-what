@@ -26,8 +26,14 @@
     <label for="sayWhat">Start typing</label>
     <input type="text" id="sayWhat" name="sayWhat" />
 
+    <p>Score: <span id="score"></span></p>
+
     <script type="text/javascript">
         const wordsNodes = Array.from(document.querySelectorAll('.words p'));
+
+        let score = 0;
+
+        const scoreNode = document.querySelector('#score');
 
         function initWords() {
             const wordsArray = [];
@@ -39,27 +45,42 @@
 
         const words = initWords();
 
+        updateScore();
+
         const input = document.querySelector('#sayWhat');
 
         input.addEventListener('keyup', function(e) {
             console.log(e.keyCode, 'key code');
-            // if ESC
+            // if ESC, clear out all selected words and the characters typed in the input
             if(e.keyCode === 27) {
                 clearAll();
             }
+            // if keycode is a letter
             if(e.keyCode >=65 && e.keyCode <= 90 || e.keyCode == 8){
                 const possibleWords = selectWords(input.value);
                 const nodesToHighlight = selectNodes(possibleWords);
-                wordsNodes.forEach(function(node){
-                    node.classList.remove('highlight');
-                    node.classList.remove('selected');
-                });
-                if(nodesToHighlight.length > 1 && nodesToHighlight.length !== wordsNodes.length) {
+                if(wordsNodes.length){
+                    wordsNodes.forEach(function(node){
+                        node.classList.remove('highlight');
+                        node.classList.remove('selected');
+                    });
+                }
+                if(nodesToHighlight.length) {
+                    if(nodesToHighlight.length > 1 && nodesToHighlight.length !== wordsNodes.length) {
                     nodesToHighlight.forEach(function(node){
                         node.classList.add('highlight');
                     })
-                } else if (nodesToHighlight.length !== wordsNodes.length) {
-                    nodesToHighlight[0].classList.add('selected');
+                    } else if (nodesToHighlight.length !== wordsNodes.length) {
+                        nodesToHighlight[0].classList.add('selected');
+                    }
+                }
+                // if an item is selected
+                if(document.querySelector('.selected')) {
+                    console.log(input.value, 'input value');
+                    console.log(document.querySelector('.selected').innerText, 'selected word')
+                    if(input.value === document.querySelector('.selected').innerText) {
+                        completeWord(document.querySelector('.selected'));
+                    }
                 }
             }
         });
@@ -69,6 +90,21 @@
             document.querySelectorAll('.highlight, .selected').forEach(function(node){
                 node.classList.remove('highlight', 'selected');
             })
+        }
+
+        function completeWord(node) {
+            accruePoints(node.innerText);
+            node.remove();
+            clearAll();
+        }
+
+        function updateScore() {
+            scoreNode.innerHTML = score;
+        }
+
+        function accruePoints(word) {
+            score = score + word.length;
+            updateScore();
         }
 
         function selectNodes(words) {
