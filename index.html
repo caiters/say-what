@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>Say What</title>
+    <title>Say What?!</title>
 
     <style>
         p { color: #666;}
@@ -13,27 +13,86 @@
     </style>
 </head>
 <body>
-    <div class="words">
-        <p>super</p>
-        <p>chicken</p>
-        <p>soup</p>
-        <p>beverage</p>
-        <p>spaghetti</p>
-        <p>waste</p>
-        <p>plate</p>
+    <div id="start" class="screen">
+        <button type="button" id="startBtn">Start</button>
+    </div>
+    <div id="game" class="screen screen--hidden">
+        <div class="words">
+        </div>
+        <label for="sayWhat">Start typing</label>
+        <input type="text" id="sayWhat" name="sayWhat" />
+        <p>Score: <span id="score"></span></p>
     </div>
 
-    <label for="sayWhat">Start typing</label>
-    <input type="text" id="sayWhat" name="sayWhat" />
-
-    <p>Score: <span id="score"></span></p>
-
     <script type="text/javascript">
-        const wordsNodes = Array.from(document.querySelectorAll('.words p'));
+        class Word {
+            constructor(text) {
+                this.text = text;
+            }
+            getLetters() {
+                return this.text.split('');
+            }
+        }
 
-        let score = 0;
+        class Gameboard {
+            constructor(state) {
+                this.state = state;
+            }
+            getWords() {
+                return Array.from(document.querySelectorAll('.words p'));
+            }
+            getWordsArea() {
+                return document.querySelector('.words');
+            }
+            getScore() {
+                return document.querySelector('#score');
+            }
+            updateScore(score) {
+                var scoreNode = getScore();
+                scoreNode.innerHTML = score;
+            }
+            init() {
+                for(var i = this.state.level; i >= 0; i--) {
+                    addNewWord();
+                }
+            }
+        }
 
-        const scoreNode = document.querySelector('#score');
+        class State {
+            constructor(score, level) {
+                this.score = score;
+                this.level = level;
+            }
+            getScore() {
+                return this.score;
+            }
+            updateScore() {
+
+            }
+        }
+
+        const gameState = new State(0, 1);
+        const gameboard = new Gameboard(gameState);
+        gameboard.init();
+
+        console.log(gameboard);
+
+        function initGame() {
+            for(var i = gameState.level; i >= 0; i--) {
+                console.log(i)
+                addNewWord();
+            }
+        }
+
+        function addNewWord() {
+            const newWord = getRandomWord();
+            gameState.words.push(newWord);
+            gameboard.innerHTML = gameboard.innerHTML + `<p>${newWord}</p>`;
+        }
+
+        function getRandomWord() {
+            return possibleWords[Math.floor(Math.random() * possibleWords.length) + 1];
+        }
 
         function initWords() {
             const wordsArray = [];
@@ -44,8 +103,7 @@
         }
 
         const words = initWords();
-
-        updateScore();
+        initGame();
 
         const input = document.querySelector('#sayWhat');
 
@@ -98,13 +156,9 @@
             clearAll();
         }
 
-        function updateScore() {
-            scoreNode.innerHTML = score;
-        }
-
         function accruePoints(word) {
-            score = score + word.length;
-            updateScore();
+            score = gameState.score + word.length;
+            gameState.updateScore();
         }
 
         function selectNodes(words) {
